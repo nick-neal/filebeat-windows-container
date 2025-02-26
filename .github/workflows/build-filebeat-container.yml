@@ -1,0 +1,27 @@
+name: Build Flannel Windows Container Image
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  
+env:
+  IMAGE_NAME: 'filebeat-windows'
+  IMAGE_VERSION: '8.17.2'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-and-publish-docker-image:
+    name: Build and Publish Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+    
+      - name: Build and push an image to container registry
+        run: |
+          echo "${{ secrets.DOCKER_SECRET }}" | docker login -u ${{ vars.DOCKER_USER }} --password-stdin
+          docker buildx create --name img-builder --use --platform windows/amd64
+          docker buildx build --provenance=false --sbom=false --platform windows/amd64 --output=type=registry --pull --build-arg=filebeatVersion=$IMAGE_VERSION -f ./Dockerfile -t ${{ vars.DOCKER_USER }}/$IMAGE_NAME:$IMAGE_VERSION .
