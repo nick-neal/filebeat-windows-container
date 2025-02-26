@@ -1,11 +1,11 @@
 ARG BASE="mcr.microsoft.com/oss/kubernetes/windows-host-process-containers-base-image:v0.1.0"
 
-FROM --platform=linux/amd64 curlimages/curl as bins
+FROM --platform=linux/amd64 ubuntu:jammy as bins
 ARG filebeatVersion="8.17.2"
 
 # https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.17.2-windows-x86_64.zip
 WORKDIR /filebeat
-RUN apt update && apt install -y unzip
+RUN apt update && apt install -y unzip curl
 RUN curl -Lo filebeat.zip https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-${filebeatVersion}-windows-x86_64.zip
 RUN unzip -j "filebeat.zip" "filebeat-${filebeatVersion}-windows-x86_64/filebeat.exe" -d .
 
