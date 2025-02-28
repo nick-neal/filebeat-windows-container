@@ -15,4 +15,4 @@ ENV PATH="C:\Windows\system32;C:\Windows;C:\WINDOWS\System32\WindowsPowerShell\v
 COPY ./docker-entrypoint.ps1 /filebeat/docker-entrypoint.ps1
 COPY --from=bins /filebeat/filebeat.exe /filebeat/filebeat.exe
 
-ENTRYPOINT ["Powershell", "/c", "$env:CONTAINER_SANDBOX_MOUNT_POINT/filebeat/docker-entrypoint.ps1"]
+ENTRYPOINT ["powershell", "/c", "$env:CONTAINER_SANDBOX_MOUNT_POINT/filebeat/docker-entrypoint.ps1"]
