@@ -71,16 +71,17 @@ spec:
       labels:
         k8s-app: filebeat
     spec:
-#      securityContext:
-#        windowsOptions:
-#          hostProcess: true
-#          runAsUserName: "NT AUTHORITY\\SYSTEM"
+      securityContext:
+        windowsOptions:
+          hostProcess: true
+          runAsUserName: "NT AUTHORITY\\Local service"
       terminationGracePeriodSeconds: 30
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat-windows
         image: nealnick/filebeat-windows:8.17.2
+        imagePullPolicy: Always
         env:
         - name: K8S_CLUSTER
           value: "homelab"
