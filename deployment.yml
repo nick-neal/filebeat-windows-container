@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: filebeat-config
-  namespace: monitoring
+  namespace: logging
   labels:
     k8s-app: filebeat
 data:
@@ -59,7 +59,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
-  namespace: monitoring
+  namespace: logging
   labels:
     k8s-app: filebeat
 spec:
@@ -71,17 +71,21 @@ spec:
       labels:
         k8s-app: filebeat
     spec:
+#      securityContext:
+#        windowsOptions:
+#          hostProcess: true
+#          runAsUserName: "NT AUTHORITY\\SYSTEM"
       terminationGracePeriodSeconds: 30
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat-windows
-        image: nealnick/filebeat:8.17.2
+        image: nealnick/filebeat-windows:8.17.2
         env:
         - name: K8S_CLUSTER
           value: "homelab"
         - name: LOGSTASH_HOST
-          value: "logstash.local"
+          value: "192.168.81.141"
         - name: LOGSTASH_PORT
           value: "5044"
         resources:
@@ -91,16 +95,24 @@ spec:
             cpu: 100m
             memory: 100Mi
         volumeMounts:
+        - name: ca-cert
+          readOnly: true
+          mountPath: C:\\certs
         - name: config
           mountPath: C:\\filebeat\\filebeat.yml
           readOnly: true
           subPath: filebeat.yml
         - name: data
-          mountPath: C:\\ProgramData\Filebeat\logs
+          mountPath: C:\\ProgramData\\Filebeat\\logs
         - name: varlog
           mountPath: C:\\var\\log
           readOnly: true
+      nodeSelector: 
+        kubernetes.io/os: windows
       volumes:
+      - name: ca-cert
+        secret: 
+          secretName: ca-cert
       - name: config
         configMap:
           defaultMode: 0600
